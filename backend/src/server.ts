@@ -1,2 +1,3 @@
-import {Backend} from '@plyb/web-game-core'
-Backend([])
+import StartServer from '@plyb/web-game-core-backend'
+
+StartServer([]);
