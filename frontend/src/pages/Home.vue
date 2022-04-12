@@ -1,16 +1,20 @@
 <template>
 <div>
   <div>
-    <label>username</label>
+    <label>Username: </label>
     <input v-model="username"/>
   </div>
   <div>
-    <button v-if="readyToStart" @click="startGame">start new game</button>
+    <button :disabled="!readyToStart" @click="startGame">start new game</button>
   </div>
   <div>
-    <label>game code</label>
+    <label>Game code: </label>
     <input v-model="gameId"/>
-    <button v-if="readyToJoin" @click="joinGame">join game</button>
+    <button :disabled="!readyToJoin" @click="joinGame">join game</button>
+  </div>
+  <div>
+    <p class="error">{{inputErrorMessage}}</p>
+    <p class="error">{{serverErrorMessage}}</p>
   </div>
 </div>
 </template>
@@ -18,20 +22,39 @@
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
 import Core from '@plyb/web-game-core-frontend';
+import { AxiosError } from 'axios'
 
 @Options({
 })
 export default class App extends Vue {
   gameId: string = sessionStorage.getItem('gameId') || '';
   username: string = sessionStorage.getItem('username') || '';
+  serverErrorMessage: string = '';
 
   async startGame() {
-    await Core.startGame(this.username);
+    try {
+      await Core.startGame(this.username);
+    } catch (e: any) {
+      const error: Error = e;
+      this.serverErrorMessage = error.message;
+    }
     console.log(sessionStorage.getItem('gameId'));
   }
 
   async joinGame() {
-    Core.joinGame(this.gameId, this.username);
+    try {
+      await Core.joinGame(this.gameId, this.username);
+    } catch (e: any) {
+      const error: AxiosError = e;
+      this.serverErrorMessage = error.response?.data;
+    }
+  }
+
+  get inputErrorMessage(): string {
+    const startMessage = this.readyToStart ? '' : 'Must input a username to start or join a game.';
+    const joinMessage = this.gameIdValid ? '' : 
+      this.gameId ? 'Invalid game id. Must enter a valid game id to join a game' : 'Must enter game code to join a game.'
+    return startMessage + ' ' + joinMessage;
   }
 
   get readyToStart(): boolean {
@@ -56,5 +79,9 @@ export default class App extends Vue {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+
+.error {
+  color: red;
 }
 </style>
