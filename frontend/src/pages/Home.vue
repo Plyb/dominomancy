@@ -24,16 +24,16 @@ import { Options, Vue } from 'vue-class-component';
 import Core from '@plyb/web-game-core-frontend';
 import { AxiosError } from 'axios'
 
-@Options({
-})
-export default class App extends Vue {
-  gameId: string = sessionStorage.getItem('gameId') || '';
-  username: string = sessionStorage.getItem('username') || '';
+@Options({})
+export default class Home extends Vue {
+  gameId: string = Core.getGameId() || '';
+  username: string = Core.getUsername() || '';
   serverErrorMessage: string = '';
 
   async startGame() {
     try {
       await Core.startGame(this.username);
+      this.goToLobby();
     } catch (e: any) {
       const error: Error = e;
       this.serverErrorMessage = error.message;
@@ -44,10 +44,15 @@ export default class App extends Vue {
   async joinGame() {
     try {
       await Core.joinGame(this.gameId, this.username);
+      this.goToLobby();
     } catch (e: any) {
       const error: AxiosError = e;
       this.serverErrorMessage = error.response?.data;
     }
+  }
+
+  goToLobby() {
+    this.$router.push('/lobby');
   }
 
   get inputErrorMessage(): string {
