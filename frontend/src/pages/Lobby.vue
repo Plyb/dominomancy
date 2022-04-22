@@ -6,7 +6,7 @@
 <div v-else>
     <p>Game code: {{gameId}}</p>
     <p>Players:</p>
-    <div v-for="playerName in model.playerNames" :key="playerName"
+    <div v-for="playerName in model.getPlayerNames()" :key="playerName"
         class="player"
     >
         <p :class="{ 'me': playerName === username }">{{playerName}}</p>
@@ -21,17 +21,18 @@
 
 <script lang="ts">
 import { Vue } from "vue-class-component";
-import LobbyModel from "@plyb/web-game-core-frontend/src/lobby";
+import LobbyModel, { LobbyListener } from "@plyb/web-game-core-frontend/src/lobby";
 import Core from "@plyb/web-game-core-frontend";
 
-
-export default class Lobby extends Vue {
+// TODO: move this to a mixin
+export default class Lobby extends Vue implements LobbyListener {
     model = new LobbyModel();
     gameId: string = Core.getGameId() || '';
     username: string = Core.getUsername() || '';
 
     mounted() {
         this.model.setUpdateRate(1000);
+        this.model.listen(this);
     }
 
     async kick(username: string) {
@@ -43,12 +44,16 @@ export default class Lobby extends Vue {
     }
 
     leaveGame() {
-        this.model.kick(this.username);
+        this.model.leave();
         this.goHome();
     }
 
-    startGame() {
-        // TODO: unimplemented
+    async startGame() {
+        this.model.startGame();
+    }
+
+    onGameStarted() {
+        this.$router.push('/game');
     }
 
     get playerNames(): string[] {
