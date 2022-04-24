@@ -1,129 +1,88 @@
 <template>
-<div class="play-table">
-    <div class="corner"></div>
-    <div class="horiz-seating"
-        :style="getHorizWidthStyle(playerSeating.top.length, playerSeating.bottom.length)"
+<div class="view-menu-holder">
+    <BubbleMenu
+        :options="viewOptions"
     >
-        <PlayerSeat v-for="player in playerSeating.top" :key="player.id"
-            :player="player"
-            :mat="gameState.mats.get(player.id)"
-        /></div>
-    <div class="corner"></div>
-
-    <div class="vert-seating">
-        <div>
-            <PlayerSeat v-for="player in playerSeating.left" :key="player.id"
-                :player="player"
-                :mat="gameState.mats.get(player.id)"
-            />
-        </div>
-    </div>
-    <div class="table-center">
-        <Board
-            :model="gameState.hub"
-        />
-    </div>
-    <div class="vert-seating">
-        <div>
-            <PlayerSeat v-for="player in playerSeating.right" :key="player.id"
-                :player="player"
-                :mat="gameState.mats.get(player.id)"
-            />
-        </div>
-    </div>
-
-    <div class="corner"></div>
-    <div class="horiz-seating"
-        :style="getHorizWidthStyle(playerSeating.bottom.length, playerSeating.top.length)"
-    >
-        <PlayerSeat v-for="player in playerSeating.bottom" :key="player.id"
-            :player="player"
-            :mat="gameState.mats.get(player.id)"
-        />
-    </div>
-    <div class="corner"></div>
+        <i class="view-menu-trigger fas fa-bars"></i>
+    </BubbleMenu>
 </div>
+<PlayTable v-if="view.type === ViewType.overall"
+    :gameState="gameState"
+    @focus-on="view = $event"
+/>
+<PlayerSeat v-else-if="view.type === ViewType.player"
+    :player="view.player"
+    :mat="gameState.mats.get(view.player.id)"
+/>
+<Board v-else-if="view.type === ViewType.hub"
+    :model="gameState.hub"
+/>
 </template>
 
 <script lang="ts">
-import Core, { BoardGameStateProxy, Player } from "@plyb/web-game-core-frontend";
+import { BoardGameStateProxy } from "@plyb/web-game-core-frontend";
 import { Options, Vue } from "vue-class-component";
-import { LTestPiece } from 'shared'
 import Board from '../components/Board.vue'
 import PlayerSeat from '../components/PlayerSeat.vue'
-type side = 'top' | 'right' | 'bottom' | 'left';
-type Seating = {
-    'top': Player[];
-    'right': Player[];
-    'bottom': Player[];
-    'left': Player[];
-}
+import BubbleMenu, { MenuOption } from "../components/BubbleMenu.vue";
+import PlayTable from "../components/PlayTable.vue";
+import { View, ViewType } from "../components/view";
 
 @Options({
     components: {
         Board,
         PlayerSeat,
+        BubbleMenu,
+        PlayTable,
     }
 })
 export default class GamePage extends Vue {
     public readonly gameState = new BoardGameStateProxy();
+    public readonly ViewType = ViewType;
+    public view: View = {
+        type: ViewType.overall,
+        label: 'Overall'
+    };
 
     public async created() {
         await this.gameState.load();
-        console.log(this.playerSeating);
     }
 
-    public get playerSeating(): Seating {
-        // TODO: this should probably use userId not username
-        const myIndex = this.gameState.players.findIndex(p => p.username === Core.getUsername());
-
-        const sides: side[] = ['bottom', 'left', 'top', 'right'];
-        return this.gameState.players.reduce((seating, player, index) => {
-            const side: side = sides[(index + sides.length - myIndex) % sides.length];
-            seating[side].push(player);
-            return seating;
-        }, { top: [], right: [], bottom: [], left: [] } as Seating);
+    public get availableViews(): View[] {
+        return [
+            { type: ViewType.overall, label: 'Overall' },
+            { type: ViewType.hub, label: 'Table Center' },
+            ...this.gameState.players.map(p => ({
+                type: ViewType.player,
+                player: p,
+                label: p.username,
+            } as View))
+        ];
     }
 
-    public getHorizWidthStyle(numSeatsSelf: number, numSeatsOther: number): string {
-        if (numSeatsSelf < numSeatsOther) {
-            return `width: ${100 * numSeatsSelf / numSeatsOther}%`;
-        }
-        return 'width: 100%';
-    } 
+    public get viewOptions(): MenuOption[] {
+        return this.availableViews.map(v => ({
+            label: v.label,
+            action: () => this.view = v,
+        }));
+    }
 }
 </script>
 
 <style scoped>
-.play-table {
-    display: grid;
-    grid-template-columns: 1fr 3fr 1fr;
+.view-menu-holder {
+    position: absolute;
+    top: 1em;
+    left: 1em;
+
+    z-index: 100;
 }
 
-.corner {
-    background-color: black;
-}
+.view-menu-trigger {
+    padding: 1em;
+    cursor: pointer;
 
-.horiz-seating {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.vert-seating {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-}
-
-.horiz-seating > *, .vert-seating > * {
-    flex-grow: 1;
-    margin: 2em;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
+    background-color: #4444;
+    border-radius: 0.5em;
 }
 </style>
