@@ -5,7 +5,7 @@
         <div class="bg-grid-cell" v-for="_ in numGridCells" :key="_"></div>
     </div>
 
-    <Piece v-for="(piece, i) in model.pieces" :key="i"
+    <PlacedPiece v-for="(piece, i) in model.pieces" :key="i"
         :model="piece"
         :numSpaces="{
             x: model.size.x,
@@ -19,7 +19,7 @@
 <script lang="ts">
 import { Board } from "@plyb/web-game-core-frontend";
 import { Options, prop, Vue } from "vue-class-component";
-import Piece from "./Piece.vue";
+import PlacedPiece from "./PlacedPiece.vue";
 
 class Props {
     model: Board = prop({
@@ -29,7 +29,7 @@ class Props {
 
 @Options({
     components: {
-        Piece
+        PlacedPiece
     }
 })
 export default class BoardComponent extends Vue.with(Props) {
@@ -57,9 +57,10 @@ export default class BoardComponent extends Vue.with(Props) {
 }
 
 .bg-grid-cell {
+    box-sizing: border-box;
     background-color: #fff;
     border: 1px solid black;
     height: 0;
-    padding-bottom: 100%;
+    padding-bottom: calc(100% - 2px); /* 100% - 2px for border */
 }
 </style>

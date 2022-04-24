@@ -1,11 +1,14 @@
 <template>
-<div class="view-menu-holder">
+<div class="view-menu-holder floating-menu">
     <BubbleMenu
         :options="viewOptions"
     >
         <i class="view-menu-trigger fas fa-bars"></i>
     </BubbleMenu>
 </div>
+<Inventory class="floating-menu"
+    :pieces="pieces"
+/>
 <PlayTable v-if="view.type === ViewType.overall"
     :gameState="gameState"
     @focus-on="view = $event"
@@ -13,6 +16,7 @@
 <PlayerSeat v-else-if="view.type === ViewType.player"
     :player="view.player"
     :mat="gameState.mats.get(view.player.id)"
+    :inventory="gameState.inventories.get(view.player.id)"
 />
 <Board v-else-if="view.type === ViewType.hub"
     :model="gameState.hub"
@@ -20,13 +24,15 @@
 </template>
 
 <script lang="ts">
-import { BoardGameStateProxy } from "@plyb/web-game-core-frontend";
+import { BoardGameStateProxy, Piece } from "@plyb/web-game-core-frontend";
 import { Options, Vue } from "vue-class-component";
+import { LTestPiece } from "shared"
 import Board from '../components/Board.vue'
 import PlayerSeat from '../components/PlayerSeat.vue'
 import BubbleMenu, { MenuOption } from "../components/BubbleMenu.vue";
 import PlayTable from "../components/PlayTable.vue";
 import { View, ViewType } from "../components/view";
+import Inventory from "../components/Inventory.vue";
 
 @Options({
     components: {
@@ -34,6 +40,7 @@ import { View, ViewType } from "../components/view";
         PlayerSeat,
         BubbleMenu,
         PlayTable,
+        Inventory
     }
 })
 export default class GamePage extends Vue {
@@ -43,9 +50,12 @@ export default class GamePage extends Vue {
         type: ViewType.overall,
         label: 'Overall'
     };
+    public pieces: Piece[] = [];
 
     public async created() {
         await this.gameState.load();
+        this.gameState.hub.placePiece(new LTestPiece(), 5, 5); // for testing
+        this.pieces = this.gameState.getInventory();
     }
 
     public get availableViews(): View[] {
@@ -74,7 +84,9 @@ export default class GamePage extends Vue {
     position: absolute;
     top: 1em;
     left: 1em;
+}
 
+.floating-menu {
     z-index: 100;
 }
 
