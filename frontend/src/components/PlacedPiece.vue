@@ -3,13 +3,14 @@
     <Piece class="piece"
         :piece="model.piece"
         :color="color"
+        :gameState="gameState"
     />
 </div>
 </template>
 
 <script lang="ts">
 import PieceMixin from "@/mixins/PieceMixin";
-import { PieceLocation } from "@plyb/web-game-core-frontend";
+import { BoardGameStateProxy, PieceLocation } from "@plyb/web-game-core-frontend";
 import { mixins, Options, prop, Vue } from "vue-class-component";
 import Piece from "./Piece.vue";
 
@@ -19,6 +20,10 @@ class Props {
     })
 
     numSpaces: {x: number, y: number} = prop({
+        required: true
+    })
+
+    gameState: BoardGameStateProxy = prop({
         required: true
     })
 }

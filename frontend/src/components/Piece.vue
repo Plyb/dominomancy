@@ -5,7 +5,9 @@
             <div
                 class="cell"
                 :style="getCellColorStyle(cell)"
-            ></div>
+            >
+                <div v-if="cell" class="click-hit-box" @click.stop="pickUp"></div>
+            </div>
         </template>
     </template>
 </div>
@@ -13,11 +15,15 @@
 
 <script lang="ts">
 import PieceMixin from "@/mixins/PieceMixin";
-import { Piece, ShapeSpace } from "@plyb/web-game-core-frontend";
+import Core, { Piece, ShapeSpace, PickUpItemAction, BoardGameStateProxy } from "@plyb/web-game-core-frontend";
 import { mixins, prop, Vue } from "vue-class-component";
 
 class Props {
     piece: Piece = prop({
+        required: true
+    })
+
+    gameState: BoardGameStateProxy = prop({
         required: true
     })
 }
@@ -31,6 +37,10 @@ export default class PieceComponent extends mixins(PieceMixin, Vue.with(Props)) 
 
     getCellColorStyle(cell: ShapeSpace) {
         return cell === ShapeSpace.Filled ? `background-color: ${this.color};` : "";
+    }
+
+    public pickUp() {
+        this.gameState.executeAction(PickUpItemAction, Core.getUserId() || '', this.piece.id);
     }
 }
 </script>
@@ -46,5 +56,11 @@ export default class PieceComponent extends mixins(PieceMixin, Vue.with(Props)) 
     height: 0;
     padding-bottom: 100%;
     margin-left: -1px;
+}
+
+.click-hit-box {
+    width: 100%;
+    padding-bottom: 100%;
+    cursor: pointer;
 }
 </style>

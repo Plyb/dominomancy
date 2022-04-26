@@ -12,17 +12,22 @@
             y: model.size.y
         }"
         :color="'green'"
+        :gameState="gameState"
     />
 </div>
 </template>
 
 <script lang="ts">
-import { Board } from "@plyb/web-game-core-frontend";
+import { Board, BoardGameStateProxy } from "@plyb/web-game-core-frontend";
 import { Options, prop, Vue } from "vue-class-component";
 import PlacedPiece from "./PlacedPiece.vue";
 
 class Props {
     model: Board = prop({
+        required: true
+    })
+
+    gameState: BoardGameStateProxy = prop({
         required: true
     })
 }

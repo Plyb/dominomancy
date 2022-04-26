@@ -9,6 +9,7 @@
             :player="player"
             :mat="gameState.mats.get(player.id)"
             :inventory="gameState.inventories.get(player.id)"
+            :gameState="gameState"
             @click="focusOn({ type: ViewType.player, player })"
         /></div>
     <div class="corner"></div>
@@ -20,6 +21,7 @@
                 :player="player"
                 :mat="gameState.mats.get(player.id)"
                 :inventory="gameState.inventories.get(player.id)"
+                :gameState="gameState"
                 @click="focusOn({ type: ViewType.player, player })"
             />
         </div>
@@ -27,6 +29,7 @@
     <div class="table-center">
         <Board class="focusable"
             :model="gameState.hub"
+            :gameState="gameState"
             @click="focusOn({ type: ViewType.hub })"
         />
     </div>
@@ -37,6 +40,7 @@
                 :player="player"
                 :mat="gameState.mats.get(player.id)"
                 :inventory="gameState.inventories.get(player.id)"
+                :gameState="gameState"
                 @click="focusOn({ type: ViewType.player, player })"
             />
         </div>
@@ -51,6 +55,7 @@
             :player="player"
             :mat="gameState.mats.get(player.id)"
             :inventory="gameState.inventories.get(player.id)"
+            :gameState="gameState"
             @click="focusOn({ type: ViewType.player, player })"
         />
     </div>

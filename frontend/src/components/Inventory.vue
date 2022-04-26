@@ -11,18 +11,23 @@
         <Piece v-for="(piece, i) in pieces" :key="i" 
             :piece="piece"
             :color="'aqua'"
+            :gameState="gameState"
         />
     </div>
 </div>
 </template>
 
 <script lang="ts">
-import { Piece } from "@plyb/web-game-core-frontend";
+import { BoardGameStateProxy, Piece } from "@plyb/web-game-core-frontend";
 import { Options, prop, Vue } from "vue-class-component";
 import PieceComponent from "./Piece.vue";
 
 class Props {
     pieces: Piece[] = prop({
+        required: true
+    })
+
+    gameState: BoardGameStateProxy = prop({
         required: true
     })
 }

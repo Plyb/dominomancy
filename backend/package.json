@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "@plyb/web-game-core": "^1.0.1",
+    "@plyb/web-game-core-backend": "file:../../game_core/backend",
     "@types/express": "^4.17.13",
     "body-parser": "^1.19.2",
     "express": "^4.17.3",

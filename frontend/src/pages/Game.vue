@@ -8,6 +8,7 @@
 </div>
 <Inventory class="floating-menu"
     :pieces="pieces"
+    :gameState="gameState"
 />
 <PlayTable v-if="view.type === ViewType.overall"
     :gameState="gameState"
@@ -17,9 +18,11 @@
     :player="view.player"
     :mat="gameState.mats.get(view.player.id)"
     :inventory="gameState.inventories.get(view.player.id)"
+    :gameState="gameState"
 />
 <Board v-else-if="view.type === ViewType.hub"
     :model="gameState.hub"
+    :gameState="gameState"
 />
 </template>
 
@@ -53,8 +56,7 @@ export default class GamePage extends Vue {
     public pieces: Piece[] = [];
 
     public async created() {
-        await this.gameState.load();
-        this.gameState.hub.placePiece(new LTestPiece(), 5, 5); // for testing
+        await this.gameState.setUpdateRate(1000);
         this.pieces = this.gameState.getInventory();
     }
 
