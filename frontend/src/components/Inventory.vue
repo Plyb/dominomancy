@@ -8,12 +8,19 @@
         <i :class="['fas', open ? 'fa-caret-down' : 'fa-caret-up']"></i>
     </div>
     <div v-if="open" class="inventory">
-        <Piece v-for="(piece, i) in pieces" :key="i" 
-            :piece="piece"
-            :color="'aqua'"
-            :gameState="gameState"
-            @long-press="onPieceLongPress(piece)"
-        />
+        <template  v-for="(piece, i) in pieces" :key="i">
+            <BubbleMenu
+                :options="piece.inventoryInteractions"
+            >
+                <Piece
+                    :piece="piece"
+                    :color="'aqua'"
+                    :gameState="gameState"
+                    @long-press="onPieceLongPress(piece)"
+                    @select="onPieceSelect(i)"
+                />
+            </BubbleMenu>
+        </template>
     </div>
 </div>
 </template>
@@ -22,6 +29,7 @@
 import { BoardGameStateProxy, Piece } from "@plyb/web-game-core-frontend";
 import { Options, prop, Vue } from "vue-class-component";
 import PieceComponent from "./Piece.vue";
+import BubbleMenu from "./BubbleMenu.vue";
 
 class Props {
     pieces: Piece[] = prop({
@@ -35,15 +43,21 @@ class Props {
 
 @Options({
     components: {
-        Piece: PieceComponent
+        Piece: PieceComponent,
+        BubbleMenu,
     }
 })
 export default class Inventory extends Vue.with(Props) {
     public open = false;
+    public selectedPieceIndex = -1;
 
     onPieceLongPress(piece: Piece) {
         this.open = false;
         this.$emit('selected-piece-for-placement', piece);
+    }
+
+    onPieceSelect(pieceIndex: number) {
+        this.selectedPieceIndex = pieceIndex;
     }
 }
 </script>

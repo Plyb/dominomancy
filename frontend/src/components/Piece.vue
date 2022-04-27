@@ -8,7 +8,9 @@
             >
                 <div v-if="cell" class="click-hit-box"
                     @mousedown="onMouseDown"
+                    @mouseup="onMouseUp"
                     @mouseleave="onMouseLeave"
+                    @click="onClick"
                 ></div>
             </div>
         </template>
@@ -60,6 +62,15 @@ export default class PieceComponent extends mixins(PieceMixin, Vue.with(Props)) 
 
     public onMouseLeave() {
         this.pressing = false;
+    }
+
+    public onMouseUp() {
+        this.pressing = false;
+    }
+
+    public onClick() {
+        this.$emit('select', this.piece);
+        console.log(this.piece);
     }
 }
 </script>

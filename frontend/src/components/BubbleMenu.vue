@@ -14,11 +14,9 @@
 
 <script lang="ts">
 import { Vue, prop } from "vue-class-component";
+import { Interaction } from "@plyb/web-game-core-frontend"
 
-export type MenuOption = {
-    label: string;
-    action: () => void;
-}
+export type MenuOption = Interaction;
 
 class Props {
     options: MenuOption[] = prop({
