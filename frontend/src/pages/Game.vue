@@ -3,6 +3,7 @@
     <div class="view-menu-holder floating-menu">
         <BubbleMenu
             :options="viewOptions"
+            :gameState="gameState"
         >
             <i class="view-menu-trigger fas fa-bars"></i>
         </BubbleMenu>

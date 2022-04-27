@@ -10,7 +10,8 @@
     <div v-if="open" class="inventory">
         <template  v-for="(piece, i) in pieces" :key="i">
             <BubbleMenu
-                :options="piece.inventoryInteractions"
+                :options="piece.getInventoryInteractions(playerId)"
+                :gameState="gameState"
             >
                 <Piece
                     :piece="piece"
@@ -26,7 +27,7 @@
 </template>
 
 <script lang="ts">
-import { BoardGameStateProxy, Piece } from "@plyb/web-game-core-frontend";
+import Core, { BoardGameStateProxy, Piece } from "@plyb/web-game-core-frontend";
 import { Options, prop, Vue } from "vue-class-component";
 import PieceComponent from "./Piece.vue";
 import BubbleMenu from "./BubbleMenu.vue";
@@ -58,6 +59,10 @@ export default class Inventory extends Vue.with(Props) {
 
     onPieceSelect(pieceIndex: number) {
         this.selectedPieceIndex = pieceIndex;
+    }
+
+    get playerId() {
+        return Core.getUserId() || "";
     }
 }
 </script>

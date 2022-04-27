@@ -38,7 +38,6 @@ export default class Home extends Vue {
       const error: Error = e;
       this.serverErrorMessage = error.message;
     }
-    console.log(sessionStorage.getItem('gameId'));
   }
 
   async joinGame() {

@@ -1,5 +1,5 @@
 <template>
-<div class="piece" :style="colStyle">
+<div class="piece" :style="[colStyle, rotationStyle]">
     <template v-for="(row, r) in piece.shape" :key="r">
         <template v-for="(cell, c) in row" :key="c">
             <div
@@ -70,7 +70,13 @@ export default class PieceComponent extends mixins(PieceMixin, Vue.with(Props)) 
 
     public onClick() {
         this.$emit('select', this.piece);
-        console.log(this.piece);
+    }
+
+    public get rotationStyle() {
+        const pivotPercents = this.piece.getPivotPercents();
+        const xOffset = 50 - (pivotPercents.x * 100); // / 2 because rotate uses the center of the element
+        const yOffset = 50 - (pivotPercents.y * 100);
+        return `transform: translate(${-xOffset}%, ${-yOffset}%) rotate(${-this.piece.rotation}deg) translate(${xOffset}%, ${yOffset}%)`
     }
 }
 </script>
