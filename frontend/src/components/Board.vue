@@ -4,7 +4,7 @@
     <div class="bg-grid" :style="gridStyle">
         <div v-for="(_, i) in numGridCells" :key="_"
             class="bg-grid-cell"
-            @mouseup="onCellSelected(i)"
+            @mouseup="onCellMouseUp(i)"
         ></div>
     </div>
 
@@ -56,8 +56,8 @@ export default class BoardComponent extends Vue.with(Props) {
         this.gameState.executeAction(PickUpItemAction, Core.getUserId() || '', pieceLocation.piece.id);
     }
 
-    onCellSelected(index: number) {
-        this.$emit('cell-selected', {
+    onCellMouseUp(index: number) {
+        this.$emit('cell-mouse-up', {
             x: index % this.model.size.x,
             y: Math.floor(index / this.model.size.x)
         });

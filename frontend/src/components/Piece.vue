@@ -18,7 +18,7 @@
 
 <script lang="ts">
 import PieceMixin from "@/mixins/PieceMixin";
-import Core, { Piece, ShapeSpace, PickUpItemAction, BoardGameStateProxy } from "@plyb/web-game-core-frontend";
+import { Piece, ShapeSpace, BoardGameStateProxy } from "@plyb/web-game-core-frontend";
 import { mixins, prop, Vue } from "vue-class-component";
 
 class Props {

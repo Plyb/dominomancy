@@ -16,7 +16,7 @@
         :gameState="gameState"
         :selectMode="pieceToBePlaced ? SelectMode.place : SelectMode.default"
         @focus-on="view = $event"
-        @cell-selected="onCellSelected($event.board, $event.cell)"
+        @cell-mouse-up="onCellMouseUp($event.board, $event.cell)"
     />
     <PlayerSeat v-else-if="view.type === ViewType.player"
         :player="view.player"
@@ -27,7 +27,7 @@
     <BoardComponent v-else-if="view.type === ViewType.hub"
         :model="gameState.hub"
         :gameState="gameState"
-        @cell-selected="onCellSelected(gameState.hub, $event)"
+        @cell-mouse-up="onCellMouseUp(gameState.hub, $event)"
     />
     <div v-if="pieceToBePlaced"
         :style="dragPiecePositionStyle"
@@ -108,7 +108,7 @@ export default class GamePage extends Vue {
         this.pieceToBePlaced = piece;
     }
 
-    async onCellSelected(board: Board, cell: Vec2) {
+    async onCellMouseUp(board: Board, cell: Vec2) {
         if (this.pieceToBePlaced) {
             await this.gameState.executeAction(
                 PlaceFromInventoryAction,
@@ -157,10 +157,11 @@ export default class GamePage extends Vue {
 }
 
 .drag-piece-container {
-    position: absolute;
+    position: fixed;
     z-index: 90;
     height: 6em;
     width: 6rem;
     pointer-events: none;
+    opacity: 0.5;
 }
 </style>

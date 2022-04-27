@@ -11,6 +11,7 @@
             :inventory="gameState.inventories.get(player.id)"
             :gameState="gameState"
             @click="focusOn({ type: ViewType.player, player })"
+            @cell-mouse-up="onCellMouseUp(gameState.mats.get(player.id), $event)"
         /></div>
     <div class="corner"></div>
 
@@ -23,6 +24,7 @@
                 :inventory="gameState.inventories.get(player.id)"
                 :gameState="gameState"
                 @click="focusOn({ type: ViewType.player, player })"
+                @cell-mouse-up="onCellMouseUp(gameState.mats.get(player.id), $event)"
             />
         </div>
     </div>
@@ -31,7 +33,7 @@
             :model="gameState.hub"
             :gameState="gameState"
             @click="focusOn({ type: ViewType.hub })"
-            @cell-selected="onCellSelected(gameState.hub, $event)"
+            @cell-mouse-up="onCellMouseUp(gameState.hub, $event)"
         />
     </div>
     <div class="vert-seating">
@@ -43,6 +45,7 @@
                 :inventory="gameState.inventories.get(player.id)"
                 :gameState="gameState"
                 @click="focusOn({ type: ViewType.player, player })"
+                @cell-mouse-up="onCellMouseUp(gameState.mats.get(player.id), $event)"
             />
         </div>
     </div>
@@ -58,6 +61,7 @@
             :inventory="gameState.inventories.get(player.id)"
             :gameState="gameState"
             @click="focusOn({ type: ViewType.player, player })"
+            @cell-mouse-up="onCellMouseUp(gameState.mats.get(player.id), $event)"
         />
     </div>
     <div class="corner"></div>
@@ -131,8 +135,8 @@ export default class PlayTable extends Vue.with(Props) {
         }
     }
 
-    onCellSelected(board: Board, cell: Vec2) {
-        this.$emit('cell-selected', {
+    onCellMouseUp(board: Board, cell: Vec2) {
+        this.$emit('cell-mouse-up', {
             board,
             cell
         });
