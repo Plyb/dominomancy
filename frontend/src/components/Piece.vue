@@ -6,7 +6,7 @@
                 class="cell"
                 :style="getCellColorStyle(cell)"
             >
-                <div v-if="cell" class="click-hit-box" @click.stop="pickUp"></div>
+                <div v-if="cell" class="click-hit-box" @click.stop="onClick"></div>
             </div>
         </template>
     </template>
@@ -39,8 +39,8 @@ export default class PieceComponent extends mixins(PieceMixin, Vue.with(Props)) 
         return cell === ShapeSpace.Filled ? `background-color: ${this.color};` : "";
     }
 
-    public pickUp() {
-        this.gameState.executeAction(PickUpItemAction, Core.getUserId() || '', this.piece.id);
+    public onClick() {
+        this.$emit('selected', this.piece);
     }
 }
 </script>

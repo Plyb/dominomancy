@@ -13,12 +13,13 @@
         }"
         :color="'green'"
         :gameState="gameState"
+        @selected="onPieceSelected(piece)"
     />
 </div>
 </template>
 
 <script lang="ts">
-import { Board, BoardGameStateProxy } from "@plyb/web-game-core-frontend";
+import Core, { Board, BoardGameStateProxy, PickUpItemAction, PieceLocation } from "@plyb/web-game-core-frontend";
 import { Options, prop, Vue } from "vue-class-component";
 import PlacedPiece from "./PlacedPiece.vue";
 
@@ -46,6 +47,10 @@ export default class BoardComponent extends Vue.with(Props) {
 
     get numGridCells() {
         return this.model.size.x * this.model.size.y;
+    }
+
+    onPieceSelected(pieceLocation: PieceLocation) {
+        this.gameState.executeAction(PickUpItemAction, Core.getUserId() || '', pieceLocation.piece.id);
     }
 }
 </script>

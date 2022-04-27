@@ -4,6 +4,7 @@
         :piece="model.piece"
         :color="color"
         :gameState="gameState"
+        @selected="onSelected"
     />
 </div>
 </template>
@@ -46,6 +47,10 @@ export default class PlacedPiece extends mixins(PieceMixin, Vue.with(Props)) {
     get positionStyle() {
         return `left: ${(this.model.x - this.model.piece.pivot.x) * 100 / this.numSpaces.x}%;` +
             `top: ${(this.model.y - this.model.piece.pivot.y) * 100 / this.numSpaces.y}%;`;
+    }
+
+    onSelected(piece: Piece) {
+        this.$emit("selected", piece);
     }
 }
 </script>

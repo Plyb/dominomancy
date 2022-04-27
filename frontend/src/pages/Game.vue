@@ -53,11 +53,9 @@ export default class GamePage extends Vue {
         type: ViewType.overall,
         label: 'Overall'
     };
-    public pieces: Piece[] = [];
 
     public async created() {
         await this.gameState.setUpdateRate(1000);
-        this.pieces = this.gameState.getInventory();
     }
 
     public get availableViews(): View[] {
@@ -77,6 +75,10 @@ export default class GamePage extends Vue {
             label: v.label,
             action: () => this.view = v,
         }));
+    }
+
+    get pieces() {
+        return this.gameState.getInventory();
     }
 }
 </script>
