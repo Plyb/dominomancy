@@ -2,7 +2,10 @@
 <div class="board">
     <!--BG grid-->
     <div class="bg-grid" :style="gridStyle">
-        <div class="bg-grid-cell" v-for="_ in numGridCells" :key="_"></div>
+        <div v-for="(_, i) in numGridCells" :key="_"
+            class="bg-grid-cell"
+            @mouseup="onCellSelected(i)"
+        ></div>
     </div>
 
     <PlacedPiece v-for="(piece, i) in model.pieces" :key="i"
@@ -13,7 +16,7 @@
         }"
         :color="'green'"
         :gameState="gameState"
-        @selected="onPieceSelected(piece)"
+        @long-press="onPieceLongPress(piece)"
     />
 </div>
 </template>
@@ -49,8 +52,15 @@ export default class BoardComponent extends Vue.with(Props) {
         return this.model.size.x * this.model.size.y;
     }
 
-    onPieceSelected(pieceLocation: PieceLocation) {
+    onPieceLongPress(pieceLocation: PieceLocation) {
         this.gameState.executeAction(PickUpItemAction, Core.getUserId() || '', pieceLocation.piece.id);
+    }
+
+    onCellSelected(index: number) {
+        this.$emit('cell-selected', {
+            x: index % this.model.size.x,
+            y: Math.floor(index / this.model.size.x)
+        });
     }
 }
 </script>

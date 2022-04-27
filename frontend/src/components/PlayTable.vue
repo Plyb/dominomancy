@@ -27,10 +27,11 @@
         </div>
     </div>
     <div class="table-center">
-        <Board class="focusable"
+        <BoardComponent :class="{'focusable': selectMode === SelectMode.default}"
             :model="gameState.hub"
             :gameState="gameState"
             @click="focusOn({ type: ViewType.hub })"
+            @cell-selected="onCellSelected(gameState.hub, $event)"
         />
     </div>
     <div class="vert-seating">
@@ -64,11 +65,12 @@
 </template>
 
 <script lang="ts">
-import Core, {BoardGameStateProxy, Player } from "@plyb/web-game-core-frontend";
+import Core, {Board, BoardGameStateProxy, Player, Vec2 } from "@plyb/web-game-core-frontend";
 import { Options, prop, Vue } from "vue-class-component";
 import PlayerSeat from "./PlayerSeat.vue";
-import Board from './Board.vue'
+import BoardComponent from './Board.vue'
 import { View, ViewType } from "./view";
+import { placeholder } from "@babel/types";
 
 
 type side = 'top' | 'right' | 'bottom' | 'left';
@@ -79,20 +81,30 @@ type Seating = {
     'left': Player[];
 }
 
+export enum SelectMode {
+    default,
+    place,
+}
+
 class Props {
     gameState: BoardGameStateProxy = prop({
+        required: true
+    });
+
+    selectMode: SelectMode = prop({
         required: true
     });
 }
 
 @Options({
     components: {
-        Board,
+        BoardComponent,
         PlayerSeat,
     }
 })
 export default class PlayTable extends Vue.with(Props) {
     public readonly ViewType = ViewType;
+    public readonly SelectMode = SelectMode;
 
     public get playerSeating(): Seating {
         // TODO: this should probably use userId not username
@@ -114,7 +126,16 @@ export default class PlayTable extends Vue.with(Props) {
     }
 
     public focusOn(view: View) {
-        this.$emit('focus-on', view);
+        if (this.selectMode === SelectMode.default) {
+            this.$emit('focus-on', view);
+        }
+    }
+
+    onCellSelected(board: Board, cell: Vec2) {
+        this.$emit('cell-selected', {
+            board,
+            cell
+        });
     }
 }
 </script>

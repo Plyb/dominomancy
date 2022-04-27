@@ -6,7 +6,10 @@
                 class="cell"
                 :style="getCellColorStyle(cell)"
             >
-                <div v-if="cell" class="click-hit-box" @click.stop="onClick"></div>
+                <div v-if="cell" class="click-hit-box"
+                    @mousedown="onMouseDown"
+                    @mouseleave="onMouseLeave"
+                ></div>
             </div>
         </template>
     </template>
@@ -30,6 +33,7 @@ class Props {
 
 
 export default class PieceComponent extends mixins(PieceMixin, Vue.with(Props)) {
+    private pressing: boolean = false;
 
     get colStyle() {
         return `grid-template-columns: repeat(${this.pieceSize.width}, 1fr);`
@@ -39,8 +43,23 @@ export default class PieceComponent extends mixins(PieceMixin, Vue.with(Props)) 
         return cell === ShapeSpace.Filled ? `background-color: ${this.color};` : "";
     }
 
-    public onClick() {
-        this.$emit('selected', this.piece);
+    public onMouseDown() {
+        this.pressing = true;
+        const longPressLength = 500;
+        setTimeout(() => {
+            if (this.pressing) {
+                this.onLongPress();
+            }
+            this.pressing = false;
+        }, longPressLength);
+    }
+
+    public onLongPress() {
+        this.$emit('long-press', this.piece);
+    }
+
+    public onMouseLeave() {
+        this.pressing = false;
     }
 }
 </script>

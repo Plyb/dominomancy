@@ -4,7 +4,7 @@
         :piece="model.piece"
         :color="color"
         :gameState="gameState"
-        @selected="onSelected"
+        @long-press="onLongPress"
     />
 </div>
 </template>
@@ -49,8 +49,8 @@ export default class PlacedPiece extends mixins(PieceMixin, Vue.with(Props)) {
             `top: ${(this.model.y - this.model.piece.pivot.y) * 100 / this.numSpaces.y}%;`;
     }
 
-    onSelected(piece: Piece) {
-        this.$emit("selected", piece);
+    onLongPress(piece: Piece) {
+        this.$emit("long-press", piece);
     }
 }
 </script>

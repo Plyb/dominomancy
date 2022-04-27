@@ -12,6 +12,7 @@
             :piece="piece"
             :color="'aqua'"
             :gameState="gameState"
+            @long-press="onPieceLongPress(piece)"
         />
     </div>
 </div>
@@ -39,6 +40,11 @@ class Props {
 })
 export default class Inventory extends Vue.with(Props) {
     public open = false;
+
+    onPieceLongPress(piece: Piece) {
+        this.open = false;
+        this.$emit('selected-piece-for-placement', piece);
+    }
 }
 </script>
 
