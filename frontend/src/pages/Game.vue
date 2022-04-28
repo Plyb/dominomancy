@@ -1,5 +1,5 @@
 <template>
-<div @mousemove="moveDragPiece">
+<div @mousemove="moveDragPiece" class="game">
     <div class="view-menu-holder floating-menu">
         <BubbleMenu
             :options="viewOptions"
@@ -139,6 +139,9 @@ export default class GamePage extends Vue {
 </script>
 
 <style scoped>
+.game {
+    user-select: none;
+}
 .view-menu-holder {
     position: absolute;
     top: 1em;
