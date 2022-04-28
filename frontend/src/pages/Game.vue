@@ -8,6 +8,9 @@
             <i class="view-menu-trigger fas fa-bars"></i>
         </BubbleMenu>
     </div>
+    <IconBar class="floating-menu icon-bar"
+        :gameState="gameState"
+    />
     <Inventory class="floating-menu"
         :pieces="pieces"
         :gameState="gameState"
@@ -55,6 +58,7 @@ import PlayTable, { SelectMode } from "../components/PlayTable.vue";
 import { View, ViewType } from "../components/view";
 import Inventory from "../components/Inventory.vue";
 import { Vec2 } from "@plyb/web-game-core-frontend";
+import IconBar from "../components/IconBar.vue";
 
 @Options({
     components: {
@@ -64,6 +68,7 @@ import { Vec2 } from "@plyb/web-game-core-frontend";
         PlayTable,
         Inventory,
         Piece: PieceComponent,
+        IconBar,
     }
 })
 export default class GamePage extends Vue {
@@ -167,5 +172,11 @@ export default class GamePage extends Vue {
     width: 6rem;
     pointer-events: none;
     opacity: 0.5;
+}
+
+.icon-bar {
+    position: absolute;
+    top: 1em;
+    right: 1em;
 }
 </style>
