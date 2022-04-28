@@ -1,18 +1,27 @@
 <template>
 <div class="holder" :style="[sizeStyle, positionStyle]">
-    <Piece class="piece"
-        :piece="model.piece"
-        :color="color"
+
+    <BubbleMenu
+        :options="piece.getBoardInteractions(boardId)"
         :gameState="gameState"
-        @long-press="onLongPress"
-    />
+        @click.stop
+    >
+        <Piece class="piece"
+            :piece="model.piece"
+            :color="color"
+            :gameState="gameState"
+            @long-press="onLongPress"
+        />
+    </BubbleMenu>
 </div>
 </template>
 
 <script lang="ts">
 import PieceMixin from "@/mixins/PieceMixin";
 import { BoardGameStateProxy, PieceLocation } from "@plyb/web-game-core-frontend";
+import { BoardId } from "@plyb/web-game-core-shared/src/model/gameState/Board";
 import { mixins, Options, prop, Vue } from "vue-class-component";
+import BubbleMenu from "./BubbleMenu.vue";
 import Piece from "./Piece.vue";
 
 class Props {
@@ -27,11 +36,16 @@ class Props {
     gameState: BoardGameStateProxy = prop({
         required: true
     })
+
+    boardId: BoardId = prop({
+        required: true
+    })
 }
 
 @Options({
     components: {
-        Piece
+        Piece,
+        BubbleMenu,
     },
 })
 export default class PlacedPiece extends mixins(PieceMixin, Vue.with(Props)) {

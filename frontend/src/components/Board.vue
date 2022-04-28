@@ -16,6 +16,7 @@
         }"
         :color="'green'"
         :gameState="gameState"
+        :boardId="model.id"
         @long-press="onPieceLongPress(piece)"
     />
 </div>
