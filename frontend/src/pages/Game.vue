@@ -41,6 +41,7 @@
             :piece="pieceToBePlaced"
             :gameState="gameState"
             :color="'green'"
+            clickThrough="true"
         />
     </div>
 </div>
@@ -102,7 +103,7 @@ export default class GamePage extends Vue {
     public get viewOptions(): MenuOption[] {
         return this.availableViews.map(v => ({
             label: v.label,
-            action: () => this.view = v,
+            action: () => (this.view = v, ''),
         }));
     }
 

@@ -72,6 +72,7 @@ export default class PlacedPiece extends mixins(PieceMixin, Vue.with(Props)) {
 <style scoped>
 .holder {
     position: absolute;
+    pointer-events: none;
 }
 
 .piece {
