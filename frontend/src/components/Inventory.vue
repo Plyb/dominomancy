@@ -45,7 +45,7 @@ import Core, { Piece } from "@plyb/web-game-core-frontend";
 import { Options, prop, Vue } from "vue-class-component";
 import PieceComponent from "./Piece.vue";
 import BubbleMenu from "./BubbleMenu.vue";
-import { Interactions } from "@plyb/web-game-core-shared/src/model/gameState/Piece";
+import { Interactions } from "@plyb/web-game-core-shared/src/model/gameState/pieces/Piece";
 import InspectPieceModal from "./InspectPieceModal.vue";
 import StateStore from "@plyb/web-game-core-frontend/src/StateStore";
 import MovePieceAction, { ContainerType } from "@plyb/web-game-core-shared/src/actions/MovePieceAction";

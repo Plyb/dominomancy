@@ -25,7 +25,7 @@
 import PieceMixin from "@/mixins/PieceMixin";
 import { PieceLocation } from "@plyb/web-game-core-frontend";
 import { BoardId } from "@plyb/web-game-core-shared/src/model/gameState/Board";
-import { Interactions } from "@plyb/web-game-core-shared/src/model/gameState/Piece";
+import { Interactions } from "@plyb/web-game-core-shared/src/model/gameState/pieces/Piece";
 import { mixins, Options, prop, Vue } from "vue-class-component";
 import BubbleMenu from "./BubbleMenu.vue";
 import Piece from "./Piece.vue";
