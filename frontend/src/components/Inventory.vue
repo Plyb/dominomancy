@@ -16,6 +16,7 @@
                 @option-selected="onInteractionSelected($event, piece)"
             >
                 <Piece
+                    :class="{'hovered': getIsHoveredOver(i)}"
                     :piece="piece"
                     :color="'aqua'"
                     :location="{
@@ -24,6 +25,8 @@
                         index: i,
                     }"
                     @select="onPieceSelect(i)"
+                    @mouseenter="onMouseEnterPiece(i)"
+                    @mouseleave="draggedOverPieceIndex = -1"
                 />
             </BubbleMenu>
         </template>
@@ -66,6 +69,7 @@ export default class Inventory extends Vue.with(Props) {
     public open = false;
     public selectedPieceIndex = -1;
     public inspectingPiece: Piece | null = null;
+    public draggedOverPieceIndex = -1;
 
     onPieceSelect(pieceIndex: number) {
         this.selectedPieceIndex = pieceIndex;
@@ -100,18 +104,31 @@ export default class Inventory extends Vue.with(Props) {
     }
 
     onMouseUp() {
-        if (StateStore.state.draggingPiece) {
+        if (StateStore.state.draggingPiece
+            && StateStore.state.draggingPiece.piece !== this.pieces[this.draggedOverPieceIndex]
+        ) {
+            const index = this.draggedOverPieceIndex > -1 ? this.draggedOverPieceIndex : this.pieces.length;
             StateStore.state.executeAction(
                 MovePieceAction,
                 StateStore.state.draggingPiece.piece.id,
                 StateStore.state.draggingPiece.from,
                 {
                     containerId: Core.getUserId() || '',
-                    index: this.pieces.length,
+                    index: index,
                     containerType: ContainerType.Inventory
                 },
             )
         }
+    }
+
+    onMouseEnterPiece(index: number) {
+        if (StateStore.state.draggingPiece) {
+            this.draggedOverPieceIndex = index;
+        }
+    }
+
+    getIsHoveredOver(index: number) {
+        return this.draggedOverPieceIndex === index && StateStore.state.draggingPiece;
     }
 }
 </script>
@@ -157,5 +174,9 @@ export default class Inventory extends Vue.with(Props) {
     box-sizing: border-box;
 
     overflow-y: auto;
+}
+
+.hovered {
+    border: 2px solid #00FF00;
 }
 </style>
