@@ -5,6 +5,7 @@
         :options="piece.getBoardInteractions(boardId)"
         :gameState="gameState"
         @click.stop
+        @option-selected="onInteractionSelected"
     >
         <Piece class="piece"
             :piece="model.piece"
@@ -13,6 +14,13 @@
             @long-press="onLongPress"
         />
     </BubbleMenu>
+
+    <InspectPieceModal v-if="interactionModalOpen"
+        :piece="model.piece"
+        :gameState="gameState"
+        class="inspect-piece-modal"
+        @close="interactionModalOpen = false"
+    />
 </div>
 </template>
 
@@ -20,9 +28,11 @@
 import PieceMixin from "@/mixins/PieceMixin";
 import { BoardGameStateProxy, PieceLocation } from "@plyb/web-game-core-frontend";
 import { BoardId } from "@plyb/web-game-core-shared/src/model/gameState/Board";
+import { Interactions } from "@plyb/web-game-core-shared/src/model/gameState/Piece";
 import { mixins, Options, prop, Vue } from "vue-class-component";
 import BubbleMenu from "./BubbleMenu.vue";
 import Piece from "./Piece.vue";
+import InspectPieceModal from "./InspectPieceModal.vue";
 
 class Props {
     model: PieceLocation = prop({
@@ -46,9 +56,12 @@ class Props {
     components: {
         Piece,
         BubbleMenu,
+        InspectPieceModal,
     },
 })
 export default class PlacedPiece extends mixins(PieceMixin, Vue.with(Props)) {
+    interactionModalOpen = false;
+
     get piece() {
         return this.model.piece;
     }
@@ -66,13 +79,19 @@ export default class PlacedPiece extends mixins(PieceMixin, Vue.with(Props)) {
     onLongPress(piece: Piece) {
         this.$emit("long-press", piece);
     }
+
+    onInteractionSelected(interaction: string) {
+        if (interaction === Interactions.Inspect) {
+            this.interactionModalOpen = true;
+        }
+    }
 }
 </script>
 
 <style scoped>
 .holder {
-    position: absolute;
     pointer-events: none;
+    position: absolute;
 }
 
 .piece {
@@ -81,5 +100,9 @@ export default class PlacedPiece extends mixins(PieceMixin, Vue.with(Props)) {
 
 .cell {
     position: absolute;
+}
+
+.inspect-piece-modal {
+    pointer-events: all;
 }
 </style>

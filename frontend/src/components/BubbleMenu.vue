@@ -6,7 +6,7 @@
     <div class="menu" v-if="open">
         <p v-for="option in options" :key="option.label"
             class="option"
-            @click="onClickOption(option.action)"
+            @click="onClickOption(option)"
         >{{option.label}}</p>
     </div>
 </div>
@@ -31,8 +31,8 @@ class Props {
 export default class BubbleMenu extends Vue.with(Props) {
     public open = false;
 
-    public onClickOption(action: (gameState: BoardGameStateProxy) => void) {
-        action(this.gameState);
+    public onClickOption(option: MenuOption) {
+        this.$emit('option-selected', option.action(this.gameState));
         this.open = false;
     }
 }
@@ -48,6 +48,7 @@ export default class BubbleMenu extends Vue.with(Props) {
     top: 0;
     left: 0;
     user-select: none;
+    pointer-events: all;
 
     background-color: #222C;
     border-radius: 0.5em;

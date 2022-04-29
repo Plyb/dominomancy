@@ -50,7 +50,6 @@
 <script lang="ts">
 import Core, { Board, BoardGameStateProxy, Piece, PlaceFromInventoryAction} from "@plyb/web-game-core-frontend";
 import { Options, Vue } from "vue-class-component";
-import { LTestPiece } from "shared"
 import BoardComponent from '../components/Board.vue'
 import PlayerSeat from '../components/PlayerSeat.vue'
 import PieceComponent from '../components/Piece.vue'

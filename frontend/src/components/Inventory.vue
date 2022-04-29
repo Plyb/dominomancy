@@ -12,6 +12,7 @@
             <BubbleMenu
                 :options="piece.getInventoryInteractions(playerId)"
                 :gameState="gameState"
+                @option-selected="onInteractionSelected($event, piece)"
             >
                 <Piece
                     :piece="piece"
@@ -23,6 +24,13 @@
             </BubbleMenu>
         </template>
     </div>
+
+    <InspectPieceModal v-if="inspectingPiece"
+        class="inspect-piece-modal"
+        :piece="inspectingPiece"
+        :gameState="gameState"
+        @close="inspectingPiece = null"
+    />
 </div>
 </template>
 
@@ -31,6 +39,8 @@ import Core, { BoardGameStateProxy, Piece } from "@plyb/web-game-core-frontend";
 import { Options, prop, Vue } from "vue-class-component";
 import PieceComponent from "./Piece.vue";
 import BubbleMenu from "./BubbleMenu.vue";
+import { Interactions } from "@plyb/web-game-core-shared/src/model/gameState/Piece";
+import InspectPieceModal from "./InspectPieceModal.vue";
 
 class Props {
     pieces: Piece[] = prop({
@@ -46,11 +56,13 @@ class Props {
     components: {
         Piece: PieceComponent,
         BubbleMenu,
+        InspectPieceModal,
     }
 })
 export default class Inventory extends Vue.with(Props) {
     public open = false;
     public selectedPieceIndex = -1;
+    public inspectingPiece: Piece | null = null;
 
     onPieceLongPress(piece: Piece) {
         this.open = false;
@@ -64,6 +76,12 @@ export default class Inventory extends Vue.with(Props) {
     get playerId() {
         return Core.getUserId() || "";
     }
+
+    onInteractionSelected(interaction: string, piece: Piece) {
+        if (interaction === Interactions.Inspect) {
+            this.inspectingPiece = piece;
+        }
+    }
 }
 </script>
 
@@ -71,16 +89,14 @@ export default class Inventory extends Vue.with(Props) {
 .container {
     position: fixed;
     bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 100%;
 }
 
 .container-open {
     height: 90vh;
-    width: 100%;
 }
 
 .trigger {
