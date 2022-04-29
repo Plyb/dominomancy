@@ -6,18 +6,12 @@
 </template>
 
 <script lang="ts">
-import BoardGameStateProxy from "@plyb/web-game-core-frontend/src/BoardGameStateProxy";
-import { prop, Vue } from "vue-class-component";
+import { Vue } from "vue-class-component";
 import UndoAction from "@plyb/web-game-core-shared/src/actions/UndoAction";
 import RedoAction from "@plyb/web-game-core-shared/src/actions/RedoAction";
+import StateStore from "@plyb/web-game-core-frontend/src/StateStore";
 
-class Props {
-    gameState: BoardGameStateProxy = prop({
-        required: true
-    });
-}
-
-export default class IconBar extends Vue.with(Props) {
+export default class IconBar extends Vue {
     undo() {
         if (this.hasActionToUndo) {
             this.gameState.executeAction(UndoAction);
@@ -36,6 +30,10 @@ export default class IconBar extends Vue.with(Props) {
 
     get hasActionToRedo() {
         return this.gameState.actionHistory.getNextUndoRedoAction(true) != null;
+    }
+
+    get gameState() {
+        return StateStore.state;
     }
 }
 </script>

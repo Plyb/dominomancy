@@ -3,21 +3,18 @@
 
     <BubbleMenu
         :options="piece.getBoardInteractions(boardId)"
-        :gameState="gameState"
         @click.stop
         @option-selected="onInteractionSelected"
     >
         <Piece class="piece"
             :piece="model.piece"
             :color="color"
-            :gameState="gameState"
-            @long-press="onLongPress"
+            :location="moveLocation"
         />
     </BubbleMenu>
 
     <InspectPieceModal v-if="interactionModalOpen"
         :piece="model.piece"
-        :gameState="gameState"
         class="inspect-piece-modal"
         @close="interactionModalOpen = false"
     />
@@ -26,13 +23,14 @@
 
 <script lang="ts">
 import PieceMixin from "@/mixins/PieceMixin";
-import { BoardGameStateProxy, PieceLocation } from "@plyb/web-game-core-frontend";
+import { PieceLocation } from "@plyb/web-game-core-frontend";
 import { BoardId } from "@plyb/web-game-core-shared/src/model/gameState/Board";
 import { Interactions } from "@plyb/web-game-core-shared/src/model/gameState/Piece";
 import { mixins, Options, prop, Vue } from "vue-class-component";
 import BubbleMenu from "./BubbleMenu.vue";
 import Piece from "./Piece.vue";
 import InspectPieceModal from "./InspectPieceModal.vue";
+import { ContainerType, MoveLocation } from "@plyb/web-game-core-shared/src/actions/MovePieceAction";
 
 class Props {
     model: PieceLocation = prop({
@@ -40,10 +38,6 @@ class Props {
     })
 
     numSpaces: {x: number, y: number} = prop({
-        required: true
-    })
-
-    gameState: BoardGameStateProxy = prop({
         required: true
     })
 
@@ -76,14 +70,18 @@ export default class PlacedPiece extends mixins(PieceMixin, Vue.with(Props)) {
             `top: ${(this.model.y - this.model.piece.pivot.y) * 100 / this.numSpaces.y}%;`;
     }
 
-    onLongPress(piece: Piece) {
-        this.$emit("long-press", piece);
-    }
-
     onInteractionSelected(interaction: string) {
         if (interaction === Interactions.Inspect) {
             this.interactionModalOpen = true;
         }
+    }
+
+    get moveLocation(): MoveLocation {
+        return {
+            containerId: this.boardId,
+            index: this.numSpaces.y * this.model.y + this.model.x,
+            containerType: ContainerType.Board,
+        };
     }
 }
 </script>

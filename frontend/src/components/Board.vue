@@ -15,24 +15,20 @@
             y: model.size.y
         }"
         :color="'green'"
-        :gameState="gameState"
         :boardId="model.id"
-        @long-press="onPieceLongPress(piece)"
     />
 </div>
 </template>
 
 <script lang="ts">
-import Core, { Board, BoardGameStateProxy, PickUpItemAction, PieceLocation } from "@plyb/web-game-core-frontend";
+import { Board, BoardGameStateProxy } from "@plyb/web-game-core-frontend";
+import StateStore from "@plyb/web-game-core-frontend/src/StateStore";
+import MovePieceAction, { ContainerType } from "@plyb/web-game-core-shared/src/actions/MovePieceAction";
 import { Options, prop, Vue } from "vue-class-component";
 import PlacedPiece from "./PlacedPiece.vue";
 
 class Props {
     model: Board = prop({
-        required: true
-    })
-
-    gameState: BoardGameStateProxy = prop({
         required: true
     })
 }
@@ -53,15 +49,19 @@ export default class BoardComponent extends Vue.with(Props) {
         return this.model.size.x * this.model.size.y;
     }
 
-    onPieceLongPress(pieceLocation: PieceLocation) {
-        this.gameState.executeAction(PickUpItemAction, Core.getUserId() || '', pieceLocation.piece.id);
-    }
-
-    onCellMouseUp(index: number) {
-        this.$emit('cell-mouse-up', {
-            x: index % this.model.size.x,
-            y: Math.floor(index / this.model.size.x)
-        });
+    async onCellMouseUp(index: number) {
+        if (StateStore.state.draggingPiece) {
+            await StateStore.state.executeAction(
+                MovePieceAction,
+                StateStore.state.draggingPiece.piece.id,
+                StateStore.state.draggingPiece.from,
+                {
+                    containerId: this.model.id,
+                    containerType: ContainerType.Board,
+                    index,
+                }
+            );
+        }
     }
 }
 </script>

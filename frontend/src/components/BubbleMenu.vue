@@ -14,16 +14,13 @@
 
 <script lang="ts">
 import { Vue, prop } from "vue-class-component";
-import { BoardGameStateProxy, Interaction } from "@plyb/web-game-core-frontend"
+import { Interaction } from "@plyb/web-game-core-frontend"
+import StateStore from "@plyb/web-game-core-frontend/src/StateStore";
 
 export type MenuOption = Interaction;
 
 class Props {
     options: MenuOption[] = prop({
-        required: true
-    })
-
-    gameState: BoardGameStateProxy = prop({
         required: true
     })
 }
@@ -32,7 +29,7 @@ export default class BubbleMenu extends Vue.with(Props) {
     public open = false;
 
     public onClickOption(option: MenuOption) {
-        this.$emit('option-selected', option.action(this.gameState));
+        this.$emit('option-selected', option.action(StateStore.state));
         this.open = false;
     }
 }

@@ -1,10 +1,9 @@
 <template>
-<div class="modal-background" @click="close">
+<div class="modal-background" @click.stop="close">
     <div class="modal">
         <h2>{{piece.getName()}}</h2>
         <Piece class="piece"
             :piece="piece"
-            :gameState="gameState"
             color="green"
         />
         <p>{{piece.getDescription()}}</p>
@@ -13,17 +12,12 @@
 </template>
 
 <script lang="ts">
-import { BoardGameStateProxy } from "@plyb/web-game-core-frontend";
 import { Piece } from "@plyb/web-game-core-shared";
 import { Options, prop, Vue } from "vue-class-component";
 import PieceComponent from "./Piece.vue";
 
 class Props {
     piece: Piece = prop({
-        required: true
-    })
-
-    gameState: BoardGameStateProxy = prop({
         required: true
     })
 }
@@ -49,6 +43,7 @@ export default class InspectPieceModal extends Vue.with(Props) {
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 100;
+    cursor: zoom-out;
 
     display: flex;
     justify-content: center;

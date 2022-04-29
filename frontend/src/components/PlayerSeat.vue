@@ -2,14 +2,13 @@
 <div>
     <Board
         :model="mat"
-        :gameState="gameState"
         @cell-mouse-up="onCellMouseUp($event)"
     />
     <p><strong>{{player.username}}</strong>: {{inventory.length}} item(s)</p>
 </div>
 </template>
 
-<script lang="ts">import { Board, BoardGameStateProxy, Piece, Player, Vec2 } from "@plyb/web-game-core-frontend";
+<script lang="ts">import { Board, Piece, Player, Vec2 } from "@plyb/web-game-core-frontend";
 import { Options, prop, Vue } from "vue-class-component";
 import BoardComponent from "./Board.vue";
 
@@ -23,10 +22,6 @@ class Props {
     })
 
     inventory: Piece[] = prop({
-        required: true
-    })
-
-    gameState: BoardGameStateProxy = prop({
         required: true
     })
 }

@@ -2,9 +2,14 @@ import Vue, { createApp, DirectiveBinding, VNode } from 'vue'
 import router from './router'
 import App from './App.vue'
 
-const app = createApp(App);
-app.directive('click-outside', {
-    beforeMount: function (el, binding) {
+type TaggedElement = Element & {
+  eventMap: {
+    [key: string]: (event: MouseEvent) => void
+  }
+}
+function createMouseOutsideDirective(eventType: 'mouseup' | 'click') {
+  return {
+    beforeMount: function (el: TaggedElement, binding: Vue.DirectiveBinding) {
       function clickOutsideEvent(event: MouseEvent) {
         // here I check that click was outside the el and his children
         if (window.document.contains(event.target as Node)
@@ -13,12 +18,20 @@ app.directive('click-outside', {
           binding.value();
         }
       }
-      el.clickOutsideEvent = clickOutsideEvent;
-      document.addEventListener('click', clickOutsideEvent)
+      if (!el.eventMap) {
+        el.eventMap = {};
+      }
+      el.eventMap[eventType] = clickOutsideEvent;
+      document.addEventListener(eventType, clickOutsideEvent)
     },
-    unmounted: function (el) {
-      document.removeEventListener('click', el.clickOutsideEvent)
+    unmounted: function (el: any) {
+      document.removeEventListener(eventType, el.eventMap[eventType])
     },
-});
+}
+}
+
+const app = createApp(App);
+app.directive('mouseup-outside', createMouseOutsideDirective('mouseup'));
+app.directive('click-outside', createMouseOutsideDirective('click'));
 app.use(router);
 app.mount('#app');

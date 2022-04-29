@@ -9,9 +9,7 @@
             :player="player"
             :mat="gameState.mats.get(player.id)"
             :inventory="gameState.inventories.get(player.id)"
-            :gameState="gameState"
-            @click="focusOn({ type: ViewType.player, player })"
-            @cell-mouse-up="onCellMouseUp(gameState.mats.get(player.id), $event)"
+            @click="focusOn({ type: ViewType.player, player }, $event)"
         /></div>
     <div class="corner"></div>
 
@@ -22,18 +20,14 @@
                 :player="player"
                 :mat="gameState.mats.get(player.id)"
                 :inventory="gameState.inventories.get(player.id)"
-                :gameState="gameState"
-                @click="focusOn({ type: ViewType.player, player })"
-                @cell-mouse-up="onCellMouseUp(gameState.mats.get(player.id), $event)"
+                @click="focusOn({ type: ViewType.player, player }, $event)"
             />
         </div>
     </div>
     <div class="table-center">
         <BoardComponent :class="{'focusable': selectMode === SelectMode.default}"
             :model="gameState.hub"
-            :gameState="gameState"
-            @click="focusOn({ type: ViewType.hub })"
-            @cell-mouse-up="onCellMouseUp(gameState.hub, $event)"
+            @click="focusOn({ type: ViewType.hub }, $event)"
         />
     </div>
     <div class="vert-seating">
@@ -43,9 +37,7 @@
                 :player="player"
                 :mat="gameState.mats.get(player.id)"
                 :inventory="gameState.inventories.get(player.id)"
-                :gameState="gameState"
-                @click="focusOn({ type: ViewType.player, player })"
-                @cell-mouse-up="onCellMouseUp(gameState.mats.get(player.id), $event)"
+                @click="focusOn({ type: ViewType.player, player }, $event)"
             />
         </div>
     </div>
@@ -59,9 +51,7 @@
             :player="player"
             :mat="gameState.mats.get(player.id)"
             :inventory="gameState.inventories.get(player.id)"
-            :gameState="gameState"
-            @click="focusOn({ type: ViewType.player, player })"
-            @cell-mouse-up="onCellMouseUp(gameState.mats.get(player.id), $event)"
+            @click="focusOn({ type: ViewType.player, player }, $event)"
         />
     </div>
     <div class="corner"></div>
@@ -69,12 +59,12 @@
 </template>
 
 <script lang="ts">
-import Core, {Board, BoardGameStateProxy, Player, Vec2 } from "@plyb/web-game-core-frontend";
+import Core, { Player } from "@plyb/web-game-core-frontend";
 import { Options, prop, Vue } from "vue-class-component";
 import PlayerSeat from "./PlayerSeat.vue";
 import BoardComponent from './Board.vue'
 import { View, ViewType } from "./view";
-import { placeholder } from "@babel/types";
+import StateStore from "@plyb/web-game-core-frontend/src/StateStore";
 
 
 type side = 'top' | 'right' | 'bottom' | 'left';
@@ -90,23 +80,13 @@ export enum SelectMode {
     place,
 }
 
-class Props {
-    gameState: BoardGameStateProxy = prop({
-        required: true
-    });
-
-    selectMode: SelectMode = prop({
-        required: true
-    });
-}
-
 @Options({
     components: {
         BoardComponent,
         PlayerSeat,
     }
 })
-export default class PlayTable extends Vue.with(Props) {
+export default class PlayTable extends Vue {
     public readonly ViewType = ViewType;
     public readonly SelectMode = SelectMode;
 
@@ -129,17 +109,19 @@ export default class PlayTable extends Vue.with(Props) {
         return 'width: 100%';
     }
 
-    public focusOn(view: View) {
-        if (this.selectMode === SelectMode.default) {
+    public focusOn(view: View, event: MouseEvent) {
+        const MOVEMENT_TOLERANCE = 50;
+        if (this.selectMode === SelectMode.default && event.offsetX + event.offsetY < MOVEMENT_TOLERANCE * 2) {
             this.$emit('focus-on', view);
         }
     }
 
-    onCellMouseUp(board: Board, cell: Vec2) {
-        this.$emit('cell-mouse-up', {
-            board,
-            cell
-        });
+    get selectMode() {
+        return StateStore.state.draggingPiece ? SelectMode.place : SelectMode.default;
+    }
+
+    get gameState() {
+        return StateStore.state;
     }
 }
 </script>

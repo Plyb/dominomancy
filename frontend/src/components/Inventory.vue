@@ -1,24 +1,28 @@
 <template>
-<div v-click-outside="() => open = false"
+<div v-click-outside="() => close()"
     :class="['container', {'container-open': open}]"
+    @mouseleave="onMouseLeave"
 >
     <div :class="['trigger', open ? 'trigger-open' : 'trigger-closed']"
         @click="open = !open"
+        @mouseenter="onMouseEnter"
     >
         <i :class="['fas', open ? 'fa-caret-down' : 'fa-caret-up']"></i>
     </div>
-    <div v-if="open" class="inventory">
+    <div v-if="open" class="inventory" @mouseup="onMouseUp">
         <template  v-for="(piece, i) in pieces" :key="i">
             <BubbleMenu
                 :options="piece.getInventoryInteractions(playerId)"
-                :gameState="gameState"
                 @option-selected="onInteractionSelected($event, piece)"
             >
                 <Piece
                     :piece="piece"
                     :color="'aqua'"
-                    :gameState="gameState"
-                    @long-press="onPieceLongPress(piece)"
+                    :location="{
+                        containerType: ContainerType.Inventory,
+                        containerId: playerId,
+                        index: i,
+                    }"
                     @select="onPieceSelect(i)"
                 />
             </BubbleMenu>
@@ -28,26 +32,23 @@
     <InspectPieceModal v-if="inspectingPiece"
         class="inspect-piece-modal"
         :piece="inspectingPiece"
-        :gameState="gameState"
         @close="inspectingPiece = null"
     />
 </div>
 </template>
 
 <script lang="ts">
-import Core, { BoardGameStateProxy, Piece } from "@plyb/web-game-core-frontend";
+import Core, { Piece } from "@plyb/web-game-core-frontend";
 import { Options, prop, Vue } from "vue-class-component";
 import PieceComponent from "./Piece.vue";
 import BubbleMenu from "./BubbleMenu.vue";
 import { Interactions } from "@plyb/web-game-core-shared/src/model/gameState/Piece";
 import InspectPieceModal from "./InspectPieceModal.vue";
+import StateStore from "@plyb/web-game-core-frontend/src/StateStore";
+import MovePieceAction, { ContainerType } from "@plyb/web-game-core-shared/src/actions/MovePieceAction";
 
 class Props {
     pieces: Piece[] = prop({
-        required: true
-    })
-
-    gameState: BoardGameStateProxy = prop({
         required: true
     })
 }
@@ -60,14 +61,11 @@ class Props {
     }
 })
 export default class Inventory extends Vue.with(Props) {
+    public readonly ContainerType = ContainerType;
+
     public open = false;
     public selectedPieceIndex = -1;
     public inspectingPiece: Piece | null = null;
-
-    onPieceLongPress(piece: Piece) {
-        this.open = false;
-        this.$emit('selected-piece-for-placement', piece);
-    }
 
     onPieceSelect(pieceIndex: number) {
         this.selectedPieceIndex = pieceIndex;
@@ -80,6 +78,39 @@ export default class Inventory extends Vue.with(Props) {
     onInteractionSelected(interaction: string, piece: Piece) {
         if (interaction === Interactions.Inspect) {
             this.inspectingPiece = piece;
+        }
+    }
+
+    onMouseEnter() {
+        if (StateStore.state.draggingPiece) {
+            this.open = true;
+            this.$emit('open-close', true);
+        }
+    }
+
+    close() {
+        this.open = false;
+        this.$emit('open-close', false);
+    }
+
+    onMouseLeave() {
+        if (StateStore.state.draggingPiece) {
+            this.close();
+        }
+    }
+
+    onMouseUp() {
+        if (StateStore.state.draggingPiece) {
+            StateStore.state.executeAction(
+                MovePieceAction,
+                StateStore.state.draggingPiece.piece.id,
+                StateStore.state.draggingPiece.from,
+                {
+                    containerId: Core.getUserId() || '',
+                    index: this.pieces.length,
+                    containerType: ContainerType.Inventory
+                },
+            )
         }
     }
 }

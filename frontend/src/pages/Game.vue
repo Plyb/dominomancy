@@ -3,43 +3,33 @@
     <div class="view-menu-holder floating-menu">
         <BubbleMenu
             :options="viewOptions"
-            :gameState="gameState"
         >
             <i class="view-menu-trigger fas fa-bars"></i>
         </BubbleMenu>
     </div>
     <IconBar class="floating-menu icon-bar"
-        :gameState="gameState"
     />
     <Inventory class="floating-menu"
         :pieces="pieces"
-        :gameState="gameState"
-        @selected-piece-for-placement="onSelectPieceForPlacement"
+        @open-close="inventoryOpen = $event"
     />
     <PlayTable v-if="view.type === ViewType.overall"
-        :gameState="gameState"
-        :selectMode="pieceToBePlaced ? SelectMode.place : SelectMode.default"
         @focus-on="view = $event"
-        @cell-mouse-up="onCellMouseUp($event.board, $event.cell)"
     />
     <PlayerSeat v-else-if="view.type === ViewType.player"
         :player="view.player"
         :mat="gameState.mats.get(view.player.id)"
         :inventory="gameState.inventories.get(view.player.id)"
-        :gameState="gameState"
     />
     <BoardComponent v-else-if="view.type === ViewType.hub"
         :model="gameState.hub"
-        :gameState="gameState"
-        @cell-mouse-up="onCellMouseUp(gameState.hub, $event)"
     />
-    <div v-if="pieceToBePlaced"
+    <div v-if="StateStore.state.draggingPiece"
         :style="dragPiecePositionStyle"
-        class="drag-piece-container"
+        :class="['drag-piece-container', {'drag-piece-over-inventory': inventoryOpen}]"
     >
         <Piece
-            :piece="pieceToBePlaced"
-            :gameState="gameState"
+            :piece="StateStore.state.draggingPiece.piece"
             :color="'green'"
             clickThrough="true"
         />
@@ -48,7 +38,7 @@
 </template>
 
 <script lang="ts">
-import Core, { Board, BoardGameStateProxy, Piece, PlaceFromInventoryAction} from "@plyb/web-game-core-frontend";
+import { BoardGameStateProxy} from "@plyb/web-game-core-frontend";
 import { Options, Vue } from "vue-class-component";
 import BoardComponent from '../components/Board.vue'
 import PlayerSeat from '../components/PlayerSeat.vue'
@@ -57,8 +47,8 @@ import BubbleMenu, { MenuOption } from "../components/BubbleMenu.vue";
 import PlayTable, { SelectMode } from "../components/PlayTable.vue";
 import { View, ViewType } from "../components/view";
 import Inventory from "../components/Inventory.vue";
-import { Vec2 } from "@plyb/web-game-core-frontend";
 import IconBar from "../components/IconBar.vue";
+import StateStore from "@plyb/web-game-core-frontend/src/StateStore";
 
 @Options({
     components: {
@@ -75,15 +65,17 @@ export default class GamePage extends Vue {
     public readonly gameState = new BoardGameStateProxy();
     public readonly ViewType = ViewType;
     public readonly SelectMode = SelectMode;
+    public readonly StateStore = StateStore;
     public view: View = {
         type: ViewType.overall,
         label: 'Overall'
     };
+    public inventoryOpen = false;
 
-    public pieceToBePlaced: Piece | null = null;
     public dragPiecePositionStyle = '';
 
     public async created() {
+        StateStore.state = this.gameState;
         await this.gameState.setUpdateRate(1000);
     }
 
@@ -110,28 +102,12 @@ export default class GamePage extends Vue {
         return this.gameState.getInventory();
     }
 
-    onSelectPieceForPlacement(piece: Piece) {
-        this.pieceToBePlaced = piece;
-    }
-
-    async onCellMouseUp(board: Board, cell: Vec2) {
-        if (this.pieceToBePlaced) {
-            await this.gameState.executeAction(
-                PlaceFromInventoryAction,
-                Core.getUserId() || '',
-                this.pieceToBePlaced.id,
-                board.id,
-                cell
-            );
-            this.pieceToBePlaced = null;
-        }
-    }
-
     moveDragPiece(event: MouseEvent) {
-        const piece = this.pieceToBePlaced;
-        if (!piece) {
+        const draggingPiece = StateStore.state.draggingPiece;
+        if (!draggingPiece) {
             return;
         }
+        const piece = draggingPiece.piece;
         const pivotPercents = {
             x: (piece.pivot.x + 0.5) / piece.shape.length,
             y: (piece.pivot.y + 0.5) / piece.shape[0].length,
@@ -167,7 +143,7 @@ export default class GamePage extends Vue {
 
 .drag-piece-container {
     position: fixed;
-    z-index: 90;
+    z-index: 210;
     height: 6em;
     width: 6rem;
     pointer-events: none;

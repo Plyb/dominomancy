@@ -1,12 +1,14 @@
 <template>
-<div class="piece" :style="[colStyle, rotationStyle]">
+<div class="piece" :style="[colStyle, rotationStyle]"
+    v-mouseup-outside="() => onMouseupOutside()"
+>
     <template v-for="(row, r) in piece.shape" :key="r">
         <template v-for="(cell, c) in row" :key="c">
             <div
                 class="cell"
                 :style="getCellColorStyle(cell)"
             >
-                <div v-if="cell" :class="['click-hit-box', {'has-hitbox': !clickThrough}]"
+                <div v-if="cell" :class="['click-hit-box', {'click-through': clickThrough}]"
                     @mousedown="onMouseDown"
                     @mouseup="onMouseUp"
                     @mouseleave="onMouseLeave"
@@ -20,7 +22,9 @@
 
 <script lang="ts">
 import PieceMixin from "@/mixins/PieceMixin";
-import { Piece, ShapeSpace, BoardGameStateProxy } from "@plyb/web-game-core-frontend";
+import { Piece, ShapeSpace } from "@plyb/web-game-core-frontend";
+import StateStore from "@plyb/web-game-core-frontend/src/StateStore";
+import { MoveLocation } from "@plyb/web-game-core-shared/src/actions/MovePieceAction";
 import { mixins, prop, Vue } from "vue-class-component";
 
 class Props {
@@ -28,13 +32,7 @@ class Props {
         required: true
     })
 
-    gameState: BoardGameStateProxy = prop({
-        required: true
-    })
-
-    clickThrough = prop({
-        default: false
-    });
+    location?: MoveLocation = undefined;
 }
 
 
@@ -61,14 +59,20 @@ export default class PieceComponent extends mixins(PieceMixin, Vue.with(Props)) 
     }
 
     public onLongPress() {
-        this.$emit('long-press', this.piece);
+        if (!this.location) {
+            return;
+        }
+        StateStore.state.draggingPiece = {
+            piece: this.piece,
+            from: this.location
+        };
     }
 
     public onMouseLeave() {
         this.pressing = false;
     }
 
-    public onMouseUp() {
+    public async onMouseUp(event: MouseEvent) {
         this.pressing = false;
     }
 
@@ -82,6 +86,17 @@ export default class PieceComponent extends mixins(PieceMixin, Vue.with(Props)) 
         const yOffset = 50 - (pivotPercents.y * 100);
         return `transform: translate(${-xOffset}%, ${-yOffset}%) rotate(${-this.piece.rotation}deg) translate(${xOffset}%, ${yOffset}%)`
     }
+
+    get clickThrough() {
+        return StateStore.state.draggingPiece;
+    }
+
+    async onMouseupOutside() {
+        if (StateStore.state.draggingPiece && StateStore.state.draggingPiece.piece === this.piece) {
+            await this.$nextTick();
+            StateStore.state.draggingPiece = null;
+        }
+    }
 }
 </script>
 
@@ -90,7 +105,6 @@ export default class PieceComponent extends mixins(PieceMixin, Vue.with(Props)) 
     height: fit-content;
     display: grid;
     grid-gap: 0;
-    pointer-events: none;
 }
 
 .cell {
@@ -103,9 +117,10 @@ export default class PieceComponent extends mixins(PieceMixin, Vue.with(Props)) 
     width: 100%;
     padding-bottom: 100%;
     cursor: pointer;
+    pointer-events: all;
 }
 
-.has-hitbox {
-    pointer-events: all;
+.click-through {
+    pointer-events: none;
 }
 </style>
