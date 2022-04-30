@@ -46,6 +46,7 @@ export default class BubbleMenu extends Vue.with(Props) {
     left: 0;
     user-select: none;
     pointer-events: all;
+    width: fit-content;
 
     background-color: #222C;
     border-radius: 0.5em;

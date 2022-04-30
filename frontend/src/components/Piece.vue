@@ -10,7 +10,7 @@
 >
     <template v-if="overlay && (!isBeingDragged || dragPiece)">
         <component  :is="overlay" class="overlay"
-        :style="clipPathStyle"
+            :style="clipPathStyle"
             :piece="piece"
         />
     </template>
@@ -26,9 +26,8 @@ import PieceMixin from "@/mixins/PieceMixin";
 import { Piece, ShapeSpace, Vec2 } from "@plyb/web-game-core-frontend";
 import StateStore from "@plyb/web-game-core-frontend/src/StateStore";
 import { MoveLocation } from "@plyb/web-game-core-shared/src/actions/MovePieceAction";
-import { mixins, Options, prop, Vue } from "vue-class-component";
+import { mixins, prop, Vue } from "vue-class-component";
 import PieceOverlays from "./pieceOverlays/PieceOverlays";
-import UnknownPieceOverlay from "./pieceOverlays/UnknownPieceOverlay.vue";
 
 class Props {
     piece: Piece = prop({
@@ -40,11 +39,6 @@ class Props {
     dragPiece: boolean = false;
 }
 
-@Options({
-    components: {
-        UnknownPieceOverlay
-    },
-})
 export default class PieceComponent extends mixins(PieceMixin, Vue.with(Props)) {
     private pressing: boolean = false;
     public size: Vec2 = {x: 0, y: 0};
@@ -62,7 +56,6 @@ export default class PieceComponent extends mixins(PieceMixin, Vue.with(Props)) 
             }
         });
         this.resizeObserver.observe(this.$refs.piece);
-        // this.overlay = shallowRef(PieceOverlays.getOverlay(this.piece));
     }
 
     get overlay() {
