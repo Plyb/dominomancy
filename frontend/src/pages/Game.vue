@@ -30,7 +30,7 @@
     >
         <Piece
             :piece="StateStore.state.draggingPiece.piece"
-            clickThrough="true"
+            dragPiece="true"
         />
     </div>
 </div>

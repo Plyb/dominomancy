@@ -12,10 +12,11 @@
 
 <script lang="ts">
 import PieceMixin from "@/mixins/PieceMixin";
+import Piece from "@plyb/web-game-core-shared/src/model/gameState/pieces/Piece";
 import { mixins } from "vue-class-component";
 import PieceOverlay from "./PieceOverlay.mixin";
 
-export default class UnknownPieceOverlay extends mixins(PieceOverlay, PieceMixin) {
+export default class UnknownPieceOverlay extends mixins(PieceOverlay<Piece>(), PieceMixin) {
 
     get colStyle() {
         return `grid-template-columns: repeat(${this.pieceSize.width}, 1fr);`

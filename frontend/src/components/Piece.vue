@@ -8,10 +8,12 @@
     @click="onClick"
     ref="piece"
 >
-    <UnknownPieceOverlay class="overlay"
-    :style="clipPathStyle"
-        :piece="piece"
-    />
+    <template v-if="overlay && (!isBeingDragged || dragPiece)">
+        <component  :is="overlay" class="overlay"
+        :style="clipPathStyle"
+            :piece="piece"
+        />
+    </template>
 
     <svg :viewBox="`0 0 ${size.x} ${size.y}`" class="overlay" preserveAspectRation="none">
         <path fill="transparent" stroke="black" stroke-width="5" :d="svgBorderPath"></path>
@@ -24,8 +26,11 @@ import PieceMixin from "@/mixins/PieceMixin";
 import { Piece, ShapeSpace, Vec2 } from "@plyb/web-game-core-frontend";
 import StateStore from "@plyb/web-game-core-frontend/src/StateStore";
 import { MoveLocation } from "@plyb/web-game-core-shared/src/actions/MovePieceAction";
+import { Component } from "vue";
 import { mixins, Options, prop, Vue } from "vue-class-component";
+import PieceOverlays from "./pieceOverlays/PieceOverlays";
 import UnknownPieceOverlay from "./pieceOverlays/UnknownPieceOverlay.vue";
+import { shallowRef } from "vue";
 
 class Props {
     piece: Piece = prop({
@@ -33,6 +38,8 @@ class Props {
     })
 
     location?: MoveLocation = undefined;
+
+    dragPiece: boolean = false;
 }
 
 @Options({
@@ -44,6 +51,7 @@ export default class PieceComponent extends mixins(PieceMixin, Vue.with(Props)) 
     private pressing: boolean = false;
     public size: Vec2 = {x: 0, y: 0};
     private resizeObserver!: ResizeObserver;
+    public overlay: Component | null = null;
 
     $refs!: {
         piece: HTMLElement
@@ -57,6 +65,7 @@ export default class PieceComponent extends mixins(PieceMixin, Vue.with(Props)) 
             }
         });
         this.resizeObserver.observe(this.$refs.piece);
+        this.overlay = shallowRef(PieceOverlays.getOverlay(this.piece));
     }
 
     beforeUnmount() {
@@ -117,6 +126,10 @@ export default class PieceComponent extends mixins(PieceMixin, Vue.with(Props)) 
 
     get clickThrough() {
         return StateStore.state.draggingPiece;
+    }
+
+    get isBeingDragged() {
+        return StateStore.state.draggingPiece && StateStore.state.draggingPiece.piece === this.piece;
     }
 
     async onMouseupOutside() {
