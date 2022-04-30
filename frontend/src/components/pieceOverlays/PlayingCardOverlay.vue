@@ -43,4 +43,9 @@ export default class PlayingCardOverlay extends PieceOverlay<PlayingCardPiece>()
 .red-suit {
     color: red;
 }
+
+h2 {
+    text-align: center;
+    font-size: 2vw;
+}
 </style>

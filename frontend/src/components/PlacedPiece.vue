@@ -2,7 +2,7 @@
 <div class="holder" :style="[sizeStyle, positionStyle]">
 
     <BubbleMenu class="trigger"
-        :options="piece.getBoardInteractions(boardId)"
+        :options="piece.getBoardInteractions(boardId, playerId)"
         @click.stop
         @option-selected="onInteractionSelected"
     >
@@ -22,7 +22,7 @@
 
 <script lang="ts">
 import PieceMixin from "@/mixins/PieceMixin";
-import { PieceLocation } from "@plyb/web-game-core-frontend";
+import Core, { PieceLocation } from "@plyb/web-game-core-frontend";
 import { BoardId } from "@plyb/web-game-core-shared/src/model/gameState/Board";
 import { Interactions } from "@plyb/web-game-core-shared/src/model/gameState/pieces/Piece";
 import { mixins, Options, prop, Vue } from "vue-class-component";
@@ -81,6 +81,10 @@ export default class PlacedPiece extends mixins(PieceMixin, Vue.with(Props)) {
             index: this.numSpaces.y * this.model.y + this.model.x,
             containerType: ContainerType.Board,
         };
+    }
+
+    get playerId() {
+        return Core.getUserId() || "";
     }
 }
 </script>
