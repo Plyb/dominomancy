@@ -14,7 +14,6 @@
             x: model.size.x,
             y: model.size.y
         }"
-        :color="'green'"
         :boardId="model.id"
     />
 </div>

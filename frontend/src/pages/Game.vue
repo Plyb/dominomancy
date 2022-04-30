@@ -30,7 +30,6 @@
     >
         <Piece
             :piece="StateStore.state.draggingPiece.piece"
-            :color="'green'"
             clickThrough="true"
         />
     </div>

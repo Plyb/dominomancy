@@ -4,7 +4,6 @@
         <h2>{{piece.getName()}}</h2>
         <Piece class="piece"
             :piece="piece"
-            color="green"
         />
         <p>{{piece.getDescription()}}</p>
     </div>

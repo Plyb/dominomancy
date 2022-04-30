@@ -1,14 +1,13 @@
 <template>
 <div class="holder" :style="[sizeStyle, positionStyle]">
 
-    <BubbleMenu
+    <BubbleMenu class="trigger"
         :options="piece.getBoardInteractions(boardId)"
         @click.stop
         @option-selected="onInteractionSelected"
     >
-        <Piece class="piece"
+        <Piece
             :piece="model.piece"
-            :color="color"
             :location="moveLocation"
         />
     </BubbleMenu>
@@ -92,7 +91,7 @@ export default class PlacedPiece extends mixins(PieceMixin, Vue.with(Props)) {
     position: absolute;
 }
 
-.piece {
+.trigger {
     width: 100%;
 }
 

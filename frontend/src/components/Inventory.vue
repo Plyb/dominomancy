@@ -18,7 +18,6 @@
                 <Piece
                     :class="{'hovered': getIsHoveredOver(i)}"
                     :piece="piece"
-                    :color="'aqua'"
                     :location="{
                         containerType: ContainerType.Inventory,
                         containerId: playerId,
