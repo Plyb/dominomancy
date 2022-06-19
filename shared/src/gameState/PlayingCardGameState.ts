@@ -1,6 +1,7 @@
 import { BoardGameState, Player } from "@plyb/web-game-core-shared/src";
 import DrawPile from "@plyb/web-game-core-shared/src/model/gameState/pieces/DrawPile";
 import PlayingCard, { Suit } from "@plyb/web-game-core-shared/src/model/gameState/pieces/PlayingCardPiece";
+import UnoCard from "../pieces/UnoCard";
 
 export default class PlayingCardGameState extends BoardGameState {
     public constructor(players: Player[]) {
@@ -10,5 +11,7 @@ export default class PlayingCardGameState extends BoardGameState {
         this.hub.placePiece(new DrawPile([], true), 2, 4);
         this.hub.placePiece(new PlayingCard(0, Suit.Joker), 0, 0);
         this.hub.placePiece(new PlayingCard(0, Suit.Joker), 1, 0);
+
+        this.hub.placePiece(new DrawPile(UnoCard.getUnoDeck()), 8, 0);
     }
 }
